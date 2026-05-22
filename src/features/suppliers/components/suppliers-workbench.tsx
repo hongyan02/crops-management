@@ -4,10 +4,7 @@ import { useDeferredValue, useMemo, useState } from "react";
 import { useQueries } from "@tanstack/react-query";
 import { ChevronDown, Search } from "lucide-react";
 
-import {
-  productMetricsQueryOptions,
-  type ProductMetric,
-} from "@/features/catalog";
+import { productMetricsQueryOptions, type ProductMetric } from "@/features/catalog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -162,7 +159,9 @@ export function SuppliersWorkbench() {
       }
     }
 
-    return Array.from(map.values()).sort((left, right) => left.name.localeCompare(right.name, "zh-CN"));
+    return Array.from(map.values()).sort((left, right) =>
+      left.name.localeCompare(right.name, "zh-CN"),
+    );
   }, [productMetricsMap, visibleRows]);
 
   const qualityQueries = useQueries({
@@ -198,7 +197,8 @@ export function SuppliersWorkbench() {
   const supplierFilterLabel =
     selectedSupplierId === "all"
       ? "全部供应商"
-      : suppliers.find((supplier) => supplier.id === Number(selectedSupplierId))?.name ?? "全部供应商";
+      : (suppliers.find((supplier) => supplier.id === Number(selectedSupplierId))?.name ??
+        "全部供应商");
 
   if (suppliersQuery.isLoading) {
     return <SuppliersWorkbenchSkeleton />;
@@ -390,7 +390,7 @@ function SuppliersWorkbenchSkeleton() {
         <Skeleton className="h-9 w-36 rounded-lg" />
         <Skeleton className="h-9 w-36 rounded-lg" />
       </div>
-      <Skeleton className="h-[520px] rounded-xl" />
+      <Skeleton className="h-130 rounded-xl" />
     </div>
   );
 }
