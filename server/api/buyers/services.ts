@@ -30,8 +30,7 @@ export interface BuyerRequirementDetail {
   metricName: string;
   metricUnit: string;
   qualityLevel: BuyerQualityLevel;
-  minValue: string | null;
-  maxValue: string | null;
+  qualityStandard: string | null;
   notes: string | null;
   createdAt: Date;
 }
@@ -186,8 +185,7 @@ export async function listBuyerProductRequirements(
       metricName: qualityMetrics.name,
       metricUnit: qualityMetrics.unit,
       qualityLevel: buyerRequirements.qualityLevel,
-      minValue: buyerRequirements.minValue,
-      maxValue: buyerRequirements.maxValue,
+      qualityStandard: buyerRequirements.qualityStandard,
       notes: buyerRequirements.notes,
       createdAt: buyerRequirements.createdAt,
     })
@@ -199,8 +197,7 @@ export async function listBuyerProductRequirements(
 const requirementInputSchema = z.object({
   metricId: z.number().int().positive(),
   qualityLevel: buyerQualityLevelSchema,
-  minValue: z.string().max(100).optional(),
-  maxValue: z.string().max(100).optional(),
+  qualityStandard: z.string().max(100).optional(),
   notes: z.string().max(200).optional(),
 });
 
@@ -234,8 +231,7 @@ export async function replaceBuyerProductRequirements(
           productId,
           metricId: requirement.metricId,
           qualityLevel: requirement.qualityLevel,
-          minValue: emptyToNull(requirement.minValue),
-          maxValue: emptyToNull(requirement.maxValue),
+          qualityStandard: emptyToNull(requirement.qualityStandard),
           notes: emptyToNull(requirement.notes),
         })),
       );

@@ -26,8 +26,7 @@ import {
 import type { Buyer, BuyerRequirement, QualityLevel } from "../types";
 
 type RequirementDraft = {
-  minValue: string;
-  maxValue: string;
+  qualityStandard: string;
   notes: string;
 };
 
@@ -100,17 +99,11 @@ export function BuyerRequirementsDialog({ buyer }: BuyerRequirementsDialogProps)
           return {
             metricId: Number(metricId),
             qualityLevel: qualityLevel as QualityLevel,
-            minValue: draft.minValue,
-            maxValue: draft.maxValue,
+            qualityStandard: draft.qualityStandard,
             notes: draft.notes,
           };
         })
-        .filter(
-          (requirement) =>
-            requirement.minValue.trim() ||
-            requirement.maxValue.trim() ||
-            requirement.notes.trim(),
-        );
+        .filter((requirement) => requirement.qualityStandard.trim() || requirement.notes.trim());
 
       await updateRequirements.mutateAsync(requirements);
     } catch (error) {
@@ -130,7 +123,7 @@ export function BuyerRequirementsDialog({ buyer }: BuyerRequirementsDialogProps)
       return {
         ...current,
         [draftKey]: {
-          ...(effectiveDrafts[draftKey] ?? { minValue: "", maxValue: "", notes: "" }),
+          ...(effectiveDrafts[draftKey] ?? { qualityStandard: "", notes: "" }),
           [key]: value,
         },
       };
@@ -221,8 +214,7 @@ export function BuyerRequirementsDialog({ buyer }: BuyerRequirementsDialogProps)
                       <div className="mt-4 grid gap-3">
                         {qualityLevels.map((level) => {
                           const draft = effectiveDrafts[getDraftKey(metric.id, level.value)] ?? {
-                            minValue: "",
-                            maxValue: "",
+                            qualityStandard: "",
                             notes: "",
                           };
 
@@ -240,39 +232,24 @@ export function BuyerRequirementsDialog({ buyer }: BuyerRequirementsDialogProps)
                                 </p>
                               </div>
 
-                              <FieldGroup className="mt-3 grid gap-3 md:grid-cols-3">
+                              <FieldGroup className="mt-3 grid gap-3 md:grid-cols-2">
                                 <Field>
-                                  <FieldLabel>最小值</FieldLabel>
+                                  <FieldLabel>质量标准</FieldLabel>
                                   <Input
-                                    placeholder={`例如：10${metric.unit}`}
-                                    value={draft.minValue}
+                                    placeholder={`例如：10-15${metric.unit}`}
+                                    value={draft.qualityStandard}
                                     onChange={(event) =>
                                       updateDraft(
                                         metric.id,
                                         level.value,
-                                        "minValue",
+                                        "qualityStandard",
                                         event.target.value,
                                       )
                                     }
                                   />
                                 </Field>
                                 <Field>
-                                  <FieldLabel>最大值</FieldLabel>
-                                  <Input
-                                    placeholder={`例如：15${metric.unit}`}
-                                    value={draft.maxValue}
-                                    onChange={(event) =>
-                                      updateDraft(
-                                        metric.id,
-                                        level.value,
-                                        "maxValue",
-                                        event.target.value,
-                                      )
-                                    }
-                                  />
-                                </Field>
-                                <Field>
-                                  <FieldLabel>说明</FieldLabel>
+                                  <FieldLabel>备注</FieldLabel>
                                   <Input
                                     placeholder="可选"
                                     value={draft.notes}
@@ -335,8 +312,7 @@ function buildDrafts(metrics: ProductMetric[], requirements: BuyerRequirement[])
       );
 
       nextDrafts[getDraftKey(metric.id, level.value)] = {
-        minValue: existing?.minValue ?? "",
-        maxValue: existing?.maxValue ?? "",
+        qualityStandard: existing?.qualityStandard ?? "",
         notes: existing?.notes ?? "",
       };
     }

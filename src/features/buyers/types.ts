@@ -22,8 +22,7 @@ export type BuyerRequirement = {
   metricName: string;
   metricUnit: string;
   qualityLevel: QualityLevel;
-  minValue: string | null;
-  maxValue: string | null;
+  qualityStandard: string | null;
   notes: string | null;
   createdAt?: string;
 };
@@ -31,8 +30,7 @@ export type BuyerRequirement = {
 export type BuyerRequirementInput = {
   metricId: number;
   qualityLevel: QualityLevel;
-  minValue?: string;
-  maxValue?: string;
+  qualityStandard?: string;
   notes?: string;
 };
 

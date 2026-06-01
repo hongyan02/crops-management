@@ -67,6 +67,7 @@ export const buyerRequirements = sqliteTable("buyer_requirements", {
     .default("standard"),
   minValue: text("min_value"),
   maxValue: text("max_value"),
+  qualityStandard: text("quality_standard"),
   notes: text("notes"),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
@@ -82,10 +83,9 @@ export const insertBuyerRequirementSchema = createInsertSchema(buyerRequirements
   productId: z.number().int().positive(),
   metricId: z.number().int().positive(),
   qualityLevel: buyerQualityLevelSchema.default("standard"),
-  minValue: z.string().optional(),
-  maxValue: z.string().optional(),
+  qualityStandard: z.string().optional(),
   notes: z.string().max(200).optional(),
-}).omit({ id: true, createdAt: true });
+}).omit({ id: true, createdAt: true, minValue: true, maxValue: true });
 
 export type InsertBuyerRequirement = z.infer<typeof insertBuyerRequirementSchema>;
 export type SelectBuyerRequirement = z.infer<typeof selectBuyerRequirementSchema>;

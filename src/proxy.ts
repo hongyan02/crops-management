@@ -2,6 +2,15 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 const sessionCookieName = process.env.BETTER_AUTH_COOKIE_NAME ?? "user_auth";
+const protectedPaths = [
+  "/dashboard",
+  "/products",
+  "/quality",
+  "/prices",
+  "/price-overview",
+  "/suppliers",
+  "/buyers",
+] as const;
 
 function readSessionCookie(request: NextRequest) {
   return (
@@ -14,8 +23,11 @@ function readSessionCookie(request: NextRequest) {
 export function proxy(request: NextRequest) {
   const sessionCookie = readSessionCookie(request);
   const { pathname } = request.nextUrl;
+  const isProtectedPath = protectedPaths.some(
+    (protectedPath) => pathname === protectedPath || pathname.startsWith(`${protectedPath}/`),
+  );
 
-  if (pathname.startsWith("/dashboard") && !sessionCookie) {
+  if (isProtectedPath && !sessionCookie) {
     return NextResponse.redirect(new URL("/sign-in", request.url));
   }
 
@@ -27,5 +39,16 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/sign-in", "/sign-up", "/work/:path*", "/dashboard/:path*"],
+  matcher: [
+    "/sign-in",
+    "/sign-up",
+    "/work/:path*",
+    "/dashboard/:path*",
+    "/products/:path*",
+    "/quality/:path*",
+    "/prices/:path*",
+    "/price-overview/:path*",
+    "/suppliers/:path*",
+    "/buyers/:path*",
+  ],
 };
