@@ -60,6 +60,13 @@ pnpm db:normalize:roles
 pnpm db:audit:relations
 ```
 
+## Vercel 部署说明
+
+- 这个项目使用 PostgreSQL；`DATABASE_URL` 必须指向 PostgreSQL 连接串，例如 `postgresql://user:password@host:5432/tradedb`。
+- 可通过 `DATABASE_POOL_MAX` 调整连接池上限，默认值为 `10`。
+- `BETTER_AUTH_URL` 必须指向线上域名，不能继续使用本地开发地址。
+- 不要依赖仓库里的 `.env` 作为生产配置，优先在 Vercel Project Settings -> Environment Variables 中维护生产变量。
+
 ## 数据关系体检
 
 在决定是否给业务关系补数据库外键前，先运行：

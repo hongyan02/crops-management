@@ -1,20 +1,17 @@
-import { sqliteTable, text, integer, index, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { index, integer, pgTable, serial, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import { sql } from "drizzle-orm";
 import { z } from "zod";
 
 // ─── 采购商 ───────────────────────────────────────────────
 
 /** 采购商表 — 存储采购商基本信息 */
-export const buyers = sqliteTable("buyers", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const buyers = pgTable("buyers", {
+  id: serial("id").primaryKey(),
   name: text("name").notNull(),
   contact: text("contact"),
   phone: text("phone"),
   address: text("address"),
-  createdAt: integer("created_at", { mode: "timestamp" })
-    .notNull()
-    .default(sql`(unixepoch())`),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
 export const insertBuyerSchema = createInsertSchema(buyers, {
@@ -32,12 +29,10 @@ export type SelectBuyer = z.infer<typeof selectBuyerSchema>;
 // ─── 采购商-产品关联 ───────────────────────────────────────
 
 /** 采购商产品关联表 — 记录采购商需要采购的产品，无外键，应用层校验 */
-export const buyerProducts = sqliteTable("buyer_products", {
+export const buyerProducts = pgTable("buyer_products", {
   buyerId: integer("buyer_id").notNull(),
   productId: integer("product_id").notNull(),
-  createdAt: integer("created_at", { mode: "timestamp" })
-    .notNull()
-    .default(sql`(unixepoch())`),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => ({
   pk: uniqueIndex("pk_buyer_products").on(t.buyerId, t.productId),
   productIdx: index("idx_bp_product").on(t.productId),
@@ -57,8 +52,8 @@ export const buyerQualityLevelSchema = z.enum(buyerQualityLevels);
 export type BuyerQualityLevel = z.infer<typeof buyerQualityLevelSchema>;
 
 /** 采购商需求表 — 记录采购商对产品质量指标的要求范围 */
-export const buyerRequirements = sqliteTable("buyer_requirements", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const buyerRequirements = pgTable("buyer_requirements", {
+  id: serial("id").primaryKey(),
   buyerId: integer("buyer_id").notNull(),
   productId: integer("product_id").notNull(),
   metricId: integer("metric_id").notNull(),
@@ -69,9 +64,7 @@ export const buyerRequirements = sqliteTable("buyer_requirements", {
   maxValue: text("max_value"),
   qualityStandard: text("quality_standard"),
   notes: text("notes"),
-  createdAt: integer("created_at", { mode: "timestamp" })
-    .notNull()
-    .default(sql`(unixepoch())`),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => ({
   buyerIdx: index("idx_br_buyer").on(t.buyerId),
   productIdx: index("idx_br_product").on(t.productId),

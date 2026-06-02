@@ -1,4 +1,4 @@
-import { eq, inArray, like, or, sql } from "drizzle-orm";
+import { eq, ilike, inArray, or, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@server/db";
@@ -32,7 +32,7 @@ export async function listProducts(params: ListProductsParams = {}): Promise<Lis
   const offset = (page - 1) * pageSize;
 
   const whereClause = search
-    ? or(like(products.name, `%${search}%`), like(products.category, `%${search}%`))
+    ? or(ilike(products.name, `%${search}%`), ilike(products.category, `%${search}%`))
     : undefined;
 
   const [data, countResult] = await Promise.all([
@@ -43,7 +43,7 @@ export async function listProducts(params: ListProductsParams = {}): Promise<Lis
       .limit(pageSize)
       .offset(offset),
     db
-      .select({ count: sql<number>`count(*)` })
+      .select({ count: sql<number>`count(*)::int` })
       .from(products)
       .where(whereClause),
   ]);

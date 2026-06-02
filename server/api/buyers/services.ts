@@ -1,4 +1,4 @@
-import { and, eq, like, sql } from "drizzle-orm";
+import { and, eq, ilike, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@server/db";
@@ -56,7 +56,7 @@ export interface ListBuyersResult {
 export async function listBuyers(params: ListBuyersParams = {}): Promise<ListBuyersResult> {
   const { search, page = 1, pageSize = 20 } = params;
   const offset = (page - 1) * pageSize;
-  const whereClause = search ? like(buyers.name, `%${search}%`) : undefined;
+  const whereClause = search ? ilike(buyers.name, `%${search}%`) : undefined;
 
   const [rows, countResult] = await Promise.all([
     db
@@ -67,8 +67,8 @@ export async function listBuyers(params: ListBuyersParams = {}): Promise<ListBuy
         phone: buyers.phone,
         address: buyers.address,
         createdAt: buyers.createdAt,
-        productCount: sql<number>`count(distinct ${buyerProducts.productId})`,
-        requirementCount: sql<number>`count(distinct ${buyerRequirements.id})`,
+        productCount: sql<number>`count(distinct ${buyerProducts.productId})::int`,
+        requirementCount: sql<number>`count(distinct ${buyerRequirements.id})::int`,
       })
       .from(buyers)
       .leftJoin(buyerProducts, eq(buyers.id, buyerProducts.buyerId))
@@ -78,7 +78,7 @@ export async function listBuyers(params: ListBuyersParams = {}): Promise<ListBuy
       .limit(pageSize)
       .offset(offset),
     db
-      .select({ count: sql<number>`count(*)` })
+      .select({ count: sql<number>`count(*)::int` })
       .from(buyers)
       .where(whereClause),
   ]);

@@ -1,20 +1,17 @@
-import { sqliteTable, text, integer, index, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { index, integer, pgTable, serial, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import { sql } from "drizzle-orm";
 import { z } from "zod";
 
 // ─── 供应商 ───────────────────────────────────────────────
 
 /** 供应商表 — 存储供应商基本信息 */
-export const suppliers = sqliteTable("suppliers", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const suppliers = pgTable("suppliers", {
+  id: serial("id").primaryKey(),
   name: text("name").notNull(),
   contact: text("contact"),
   phone: text("phone"),
   address: text("address"),
-  createdAt: integer("created_at", { mode: "timestamp" })
-    .notNull()
-    .default(sql`(unixepoch())`),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
 export const insertSupplierSchema = createInsertSchema(suppliers, {
@@ -32,12 +29,10 @@ export type SelectSupplier = z.infer<typeof selectSupplierSchema>;
 // ─── 供应商-产品关联 ───────────────────────────────────────
 
 /** 供应商产品关联表 — 记录供应商可供应的产品，无外键，应用层校验 */
-export const supplierProducts = sqliteTable("supplier_products", {
+export const supplierProducts = pgTable("supplier_products", {
   supplierId: integer("supplier_id").notNull(),
   productId: integer("product_id").notNull(),
-  createdAt: integer("created_at", { mode: "timestamp" })
-    .notNull()
-    .default(sql`(unixepoch())`),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => ({
   pk: uniqueIndex("pk_supplier_products").on(t.supplierId, t.productId),
   productIdx: index("idx_sp_product").on(t.productId),
@@ -53,19 +48,15 @@ export type InsertSupplierProduct = z.infer<typeof insertSupplierProductSchema>;
 // ─── 供应商质量记录 ────────────────────────────────────────
 
 /** 供应商质量记录表 — 记录供应商每批次供货的质检数据 */
-export const supplierQuality = sqliteTable("supplier_quality", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const supplierQuality = pgTable("supplier_quality", {
+  id: serial("id").primaryKey(),
   supplierId: integer("supplier_id").notNull(),
   productId: integer("product_id").notNull(),
   metricId: integer("metric_id").notNull(),
   value: text("value").notNull(),
   batchNo: text("batch_no"),
-  recordedAt: integer("recorded_at", { mode: "timestamp" })
-    .notNull()
-    .default(sql`(unixepoch())`),
-  createdAt: integer("created_at", { mode: "timestamp" })
-    .notNull()
-    .default(sql`(unixepoch())`),
+  recordedAt: timestamp("recorded_at", { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => ({
   supplierIdx: index("idx_sq_supplier").on(t.supplierId),
   productIdx: index("idx_sq_product").on(t.productId),

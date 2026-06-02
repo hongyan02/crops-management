@@ -1,4 +1,4 @@
-import { and, asc, eq, inArray, like, or, sql } from "drizzle-orm";
+import { and, asc, eq, ilike, inArray, or, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@server/db";
@@ -128,7 +128,7 @@ export async function listQualityOverview(
       )
       .limit(pageSize)
       .offset(offset),
-    db.select({ count: sql<number>`count(*)` }).from(filteredPairsSubquery),
+    db.select({ count: sql<number>`count(*)::int` }).from(filteredPairsSubquery),
     categoriesQuery,
   ]);
 
@@ -242,9 +242,9 @@ function createOverviewWhereClause(params: {
 
     conditions.push(
       or(
-        like(products.name, searchKeyword),
-        like(products.category, searchKeyword),
-        like(suppliers.name, searchKeyword),
+        ilike(products.name, searchKeyword),
+        ilike(products.category, searchKeyword),
+        ilike(suppliers.name, searchKeyword),
         sql`exists (
           select 1
           from ${supplierQuality} as sq
@@ -252,7 +252,7 @@ function createOverviewWhereClause(params: {
             on ${qualityMetrics.id} = sq.metric_id
           where sq.supplier_id = ${supplierQuality.supplierId}
             and sq.product_id = ${supplierQuality.productId}
-            and ${qualityMetrics.name} like ${searchKeyword}
+            and ${qualityMetrics.name} ilike ${searchKeyword}
         )`,
       ),
     );

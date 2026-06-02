@@ -1,4 +1,4 @@
-import { eq, like, sql } from "drizzle-orm";
+import { eq, ilike, sql } from "drizzle-orm";
 
 import { db } from "@server/db";
 import { countQualityMetricReferences } from "../catalog/repository";
@@ -28,7 +28,7 @@ export async function listMetrics(params: ListMetricsParams = {}): Promise<ListM
   const { search, page = 1, pageSize = 20 } = params;
   const offset = (page - 1) * pageSize;
 
-  const whereClause = search ? like(qualityMetrics.name, `%${search}%`) : undefined;
+  const whereClause = search ? ilike(qualityMetrics.name, `%${search}%`) : undefined;
 
   const [data, countResult] = await Promise.all([
     db
@@ -38,7 +38,7 @@ export async function listMetrics(params: ListMetricsParams = {}): Promise<ListM
       .limit(pageSize)
       .offset(offset),
     db
-      .select({ count: sql<number>`count(*)` })
+      .select({ count: sql<number>`count(*)::int` })
       .from(qualityMetrics)
       .where(whereClause),
   ]);

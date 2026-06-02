@@ -1,4 +1,4 @@
-import { and, desc, eq, inArray, like, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@server/db";
@@ -56,7 +56,7 @@ export async function listSuppliers(
 ): Promise<ListSuppliersResult> {
   const { search, page = 1, pageSize = 20 } = params;
   const offset = (page - 1) * pageSize;
-  const whereClause = search ? like(suppliers.name, `%${search}%`) : undefined;
+  const whereClause = search ? ilike(suppliers.name, `%${search}%`) : undefined;
 
   const [rows, countResult] = await Promise.all([
     db
@@ -67,8 +67,8 @@ export async function listSuppliers(
         phone: suppliers.phone,
         address: suppliers.address,
         createdAt: suppliers.createdAt,
-        productCount: sql<number>`count(distinct ${supplierProducts.productId})`,
-        qualityRecordCount: sql<number>`count(distinct ${supplierQuality.id})`,
+        productCount: sql<number>`count(distinct ${supplierProducts.productId})::int`,
+        qualityRecordCount: sql<number>`count(distinct ${supplierQuality.id})::int`,
       })
       .from(suppliers)
       .leftJoin(supplierProducts, eq(suppliers.id, supplierProducts.supplierId))
@@ -78,7 +78,7 @@ export async function listSuppliers(
       .limit(pageSize)
       .offset(offset),
     db
-      .select({ count: sql<number>`count(*)` })
+      .select({ count: sql<number>`count(*)::int` })
       .from(suppliers)
       .where(whereClause),
   ]);

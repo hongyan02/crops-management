@@ -1,4 +1,6 @@
-import { sqliteClient } from "./index";
+import { sql } from "drizzle-orm";
+
+import { db } from "./index";
 
 type AuditCheck = {
   name: string;
@@ -10,7 +12,7 @@ const checks: AuditCheck[] = [
   {
     name: "product_metrics_orphans",
     sql: `
-      select count(*) as count
+      select count(*)::int as count
       from product_metrics pm
       left join products p on p.id = pm.product_id
       left join quality_metrics qm on qm.id = pm.metric_id
@@ -21,7 +23,7 @@ const checks: AuditCheck[] = [
   {
     name: "buyer_products_orphans",
     sql: `
-      select count(*) as count
+      select count(*)::int as count
       from buyer_products bp
       left join buyers b on b.id = bp.buyer_id
       left join products p on p.id = bp.product_id
@@ -32,7 +34,7 @@ const checks: AuditCheck[] = [
   {
     name: "buyer_requirements_orphans",
     sql: `
-      select count(*) as count
+      select count(*)::int as count
       from buyer_requirements br
       left join buyers b on b.id = br.buyer_id
       left join products p on p.id = br.product_id
@@ -44,7 +46,7 @@ const checks: AuditCheck[] = [
   {
     name: "supplier_products_orphans",
     sql: `
-      select count(*) as count
+      select count(*)::int as count
       from supplier_products sp
       left join suppliers s on s.id = sp.supplier_id
       left join products p on p.id = sp.product_id
@@ -55,7 +57,7 @@ const checks: AuditCheck[] = [
   {
     name: "supplier_quality_orphans",
     sql: `
-      select count(*) as count
+      select count(*)::int as count
       from supplier_quality sq
       left join suppliers s on s.id = sq.supplier_id
       left join products p on p.id = sq.product_id
@@ -70,7 +72,7 @@ async function main() {
   const results = [];
 
   for (const check of checks) {
-    const result = await sqliteClient.execute(check.sql);
+    const result = await db.execute(sql.raw(check.sql));
     const count = Number(result.rows[0]?.count ?? 0);
 
     results.push({

@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, like, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, or, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@server/db";
@@ -113,7 +113,7 @@ export async function listLatestPrices(input: unknown): Promise<ListLatestPrices
         createdAt: latestPricesSubquery.createdAt,
         historyCount: sql<number>`
           (
-            select count(*)
+            select count(*)::int
             from ${supplierProductPrices} as price_history
             where price_history.supplier_id = ${latestPricesSubquery.supplierId}
               and price_history.product_id = ${latestPricesSubquery.productId}
@@ -130,7 +130,7 @@ export async function listLatestPrices(input: unknown): Promise<ListLatestPrices
       )
       .limit(pageSize)
       .offset(offset),
-    db.select({ count: sql<number>`count(*)` }).from(latestPricesSubquery).where(whereClause),
+    db.select({ count: sql<number>`count(*)::int` }).from(latestPricesSubquery).where(whereClause),
     db
       .selectDistinct({ category: latestPricesSubquery.category })
       .from(latestPricesSubquery)
@@ -275,9 +275,9 @@ function createLatestPriceWhereClause(
     const keyword = `%${params.search}%`;
     conditions.push(
       or(
-        like(latestPricesSubquery.productName, keyword),
-        like(latestPricesSubquery.category, keyword),
-        like(latestPricesSubquery.supplierName, keyword),
+        ilike(latestPricesSubquery.productName, keyword),
+        ilike(latestPricesSubquery.category, keyword),
+        ilike(latestPricesSubquery.supplierName, keyword),
       ),
     );
   }

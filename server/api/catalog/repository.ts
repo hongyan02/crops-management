@@ -96,7 +96,7 @@ export async function countQualityMetricReferences(metricId: number) {
 
 async function countProductMetricRows(productId: number) {
   const result = await db
-    .select({ count: sql<number>`count(*)` })
+    .select({ count: sql<number>`count(*)::int` })
     .from(productMetrics)
     .where(eq(productMetrics.productId, productId));
 
@@ -105,7 +105,7 @@ async function countProductMetricRows(productId: number) {
 
 async function countBuyerProductRows(productId: number) {
   const result = await db
-    .select({ count: sql<number>`count(*)` })
+    .select({ count: sql<number>`count(*)::int` })
     .from(buyerProducts)
     .where(eq(buyerProducts.productId, productId));
 
@@ -114,7 +114,7 @@ async function countBuyerProductRows(productId: number) {
 
 async function countBuyerRequirementRows(productId: number) {
   const result = await db
-    .select({ count: sql<number>`count(*)` })
+    .select({ count: sql<number>`count(*)::int` })
     .from(buyerRequirements)
     .where(eq(buyerRequirements.productId, productId));
 
@@ -123,7 +123,7 @@ async function countBuyerRequirementRows(productId: number) {
 
 async function countSupplierProductRows(productId: number) {
   const result = await db
-    .select({ count: sql<number>`count(*)` })
+    .select({ count: sql<number>`count(*)::int` })
     .from(supplierProducts)
     .where(eq(supplierProducts.productId, productId));
 
@@ -132,7 +132,7 @@ async function countSupplierProductRows(productId: number) {
 
 async function countSupplierQualityRows(productId: number) {
   const result = await db
-    .select({ count: sql<number>`count(*)` })
+    .select({ count: sql<number>`count(*)::int` })
     .from(supplierQuality)
     .where(eq(supplierQuality.productId, productId));
 
@@ -141,7 +141,7 @@ async function countSupplierQualityRows(productId: number) {
 
 async function countSupplierPriceRows(productId: number) {
   const result = await db
-    .select({ count: sql<number>`count(*)` })
+    .select({ count: sql<number>`count(*)::int` })
     .from(supplierProductPrices)
     .where(eq(supplierProductPrices.productId, productId));
 
@@ -150,7 +150,7 @@ async function countSupplierPriceRows(productId: number) {
 
 async function countMetricBindingRows(metricId: number) {
   const result = await db
-    .select({ count: sql<number>`count(*)` })
+    .select({ count: sql<number>`count(*)::int` })
     .from(productMetrics)
     .where(eq(productMetrics.metricId, metricId));
 
@@ -159,7 +159,7 @@ async function countMetricBindingRows(metricId: number) {
 
 async function countBuyerRequirementMetricRows(metricId: number) {
   const result = await db
-    .select({ count: sql<number>`count(*)` })
+    .select({ count: sql<number>`count(*)::int` })
     .from(buyerRequirements)
     .where(eq(buyerRequirements.metricId, metricId));
 
@@ -168,7 +168,7 @@ async function countBuyerRequirementMetricRows(metricId: number) {
 
 async function countSupplierQualityMetricRows(metricId: number) {
   const result = await db
-    .select({ count: sql<number>`count(*)` })
+    .select({ count: sql<number>`count(*)::int` })
     .from(supplierQuality)
     .where(eq(supplierQuality.metricId, metricId));
 

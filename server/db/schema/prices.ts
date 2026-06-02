@@ -1,25 +1,20 @@
-import { index, integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { doublePrecision, index, integer, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import { sql } from "drizzle-orm";
 import { z } from "zod";
 
 // ─── 供应商产品价格记录 ────────────────────────────────────
 
 /** 供应商产品价格记录表 — 记录供应商产品报价历史 */
-export const supplierProductPrices = sqliteTable(
+export const supplierProductPrices = pgTable(
   "supplier_product_prices",
   {
-    id: integer("id").primaryKey({ autoIncrement: true }),
+    id: serial("id").primaryKey(),
     supplierId: integer("supplier_id").notNull(),
     productId: integer("product_id").notNull(),
-    price: real("price").notNull(),
-    quotedAt: integer("quoted_at", { mode: "timestamp" })
-      .notNull()
-      .default(sql`(unixepoch())`),
+    price: doublePrecision("price").notNull(),
+    quotedAt: timestamp("quoted_at", { withTimezone: true }).notNull().defaultNow(),
     note: text("note"),
-    createdAt: integer("created_at", { mode: "timestamp" })
-      .notNull()
-      .default(sql`(unixepoch())`),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => ({
     supplierProductIdx: index("idx_spp_supplier_product").on(t.supplierId, t.productId),

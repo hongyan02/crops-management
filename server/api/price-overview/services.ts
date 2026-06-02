@@ -1,4 +1,4 @@
-import { and, asc, eq, inArray, like, or, sql } from "drizzle-orm";
+import { and, asc, eq, ilike, inArray, or, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@server/db";
@@ -205,7 +205,7 @@ async function listLatestRowsForProducts(productIds: number[]): Promise<PriceOve
       createdAt: rankedPricesSubquery.createdAt,
       historyCount: sql<number>`
         (
-          select count(*)
+          select count(*)::int
           from ${supplierProductPrices} as price_history
           where price_history.product_id = ${rankedPricesSubquery.productId}
             and price_history.supplier_id = ${rankedPricesSubquery.supplierId}
@@ -225,7 +225,7 @@ function createProductWhereClause(params: { search?: string; category?: string }
 
   if (params.search) {
     const keyword = `%${params.search}%`;
-    conditions.push(or(like(products.name, keyword), like(products.category, keyword)));
+    conditions.push(or(ilike(products.name, keyword), ilike(products.category, keyword)));
   }
 
   if (conditions.length === 0) {

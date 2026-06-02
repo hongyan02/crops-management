@@ -1,27 +1,26 @@
-import { mkdirSync } from "node:fs";
-import { dirname, resolve } from "node:path";
+import pg from "pg";
+import { drizzle } from "drizzle-orm/node-postgres";
 
-import { createClient } from "@libsql/client";
-import { drizzle } from "drizzle-orm/libsql";
-
+import { getDatabaseConfig } from "./config";
 import { schema } from "./schema";
 
-const rawUrl = process.env.DATABASE_URL ?? "./data/app.db";
-const localPath = rawUrl.startsWith("file:") ? rawUrl.replace(/^file:/, "") : rawUrl;
-const resolvedUrl = resolve(localPath);
-const databaseUrl = rawUrl.startsWith("file:") ? rawUrl : `file:${resolvedUrl}`;
-
-mkdirSync(dirname(resolvedUrl), { recursive: true });
+const databaseConfig = getDatabaseConfig();
+const { Pool } = pg;
 
 const globalForDatabase = globalThis as typeof globalThis & {
-  sqliteClient?: ReturnType<typeof createClient>;
+  pgPool?: pg.Pool;
 };
 
-const sqliteClient = globalForDatabase.sqliteClient ?? createClient({ url: databaseUrl });
+const pgPool =
+  globalForDatabase.pgPool ??
+  new Pool({
+    connectionString: databaseConfig.url,
+    max: Number(process.env.DATABASE_POOL_MAX ?? 10),
+  });
 
 if (process.env.NODE_ENV !== "production") {
-  globalForDatabase.sqliteClient = sqliteClient;
+  globalForDatabase.pgPool = pgPool;
 }
 
-export { sqliteClient };
-export const db = drizzle(sqliteClient, { schema });
+export { pgPool };
+export const db = drizzle(pgPool, { schema });
