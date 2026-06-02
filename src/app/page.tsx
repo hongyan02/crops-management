@@ -19,7 +19,7 @@ const featureCards = [
   },
   {
     title: "本地先跑通",
-    description: "SQLite + Better Auth，后续再接业务模块。",
+    description: "PostgreSQL + Better Auth，支撑当前业务模块。",
     icon: Database,
   },
 ];
@@ -74,7 +74,7 @@ export default async function Home() {
             </div>
 
             <p className="max-w-3xl text-lg leading-8 text-muted-foreground sm:text-xl">
-              先把登录、路由保护和工作台入口收干净，再往里接用户、权限和业务模块。
+              登录、路由保护、权限与业务模块已经收敛到统一工作台入口。
             </p>
 
             <div className="flex flex-col items-center gap-3 sm:flex-row">

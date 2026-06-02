@@ -10,7 +10,6 @@
     "lint": "eslint",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx server/db/migrate.ts",
-    "db:migrate:data": "tsx server/db/migrate-sqlite-data-to-postgres.ts",
     "db:seed:admin": "tsx server/db/seed-admin.ts",
     "db:normalize:roles": "tsx server/db/normalize-user-roles.ts",
     "db:audit:relations": "tsx server/db/audit-relations.ts"
